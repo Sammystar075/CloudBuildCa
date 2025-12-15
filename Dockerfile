@@ -7,7 +7,9 @@ ENTRYPOINT ["nginx", "-g", "daemon off;"]
 COPY default.conf /etc/nginx/conf.d/default.conf
 
 # html page
-COPY index.html /usr/share/nginx/html/index.html
+COPY markdown-editor.html /usr/share/nginx/html/markdown-editor.html
+COPY markdown-editor.css /usr/share/nginx/html/markdown-editor.css
+COPY markdown-editor.js /usr/share/nginx/html/markdown-editor.js
 
 # Expose port
 ENV PORT=8080
