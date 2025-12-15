@@ -1,19 +1,14 @@
-FROM node:22-alpine
+FROM nginx:stable-alpine
 
-# Set working directory
-WORKDIR /app
+ENTRYPOINT ["nginx", "-g", "daemon off;"]
 
-# Copy package files
-COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --omit=dev
+# nginx conf
+COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Copy application files
-COPY . .
+# html page
+COPY index.html /usr/share/nginx/html/index.html
 
 # Expose port
+ENV PORT=8080
 EXPOSE 8080
-
-# Start the application
-CMD ["node", "app.js"]
