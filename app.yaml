@@ -1,0 +1,19 @@
+runtime: custom
+env: flex
+
+automatic_scaling:
+  min_num_instances: 1
+  max_num_instances: 2
+
+liveness_check:
+  path: "/"
+  check_interval_sec: 120
+  failure_threshold: 3
+
+readiness_check:
+  path: "/"
+  app_start_timeout_sec: 30
+
+resources:
+  cpu: 1
+  memory_gb: 0.5
