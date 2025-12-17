@@ -21,4 +21,4 @@ steps:
 
 images:
   - 'gcr.io/$PROJECT_ID/nginx-alpine-simple:latest'
-logging: none
+logging: NONE
