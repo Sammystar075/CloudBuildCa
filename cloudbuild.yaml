@@ -2,37 +2,35 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # Clone the website repo
+  # Clone website files
   - name: gcr.io/cloud-builders/git
     args:
       - clone
       - https://github.com/Sammystar075/kindle-suite.git
+      - site
 
-  # Build the Docker image
+  # Build image
   - name: gcr.io/cloud-builders/docker
     args:
       - build
       - -t
-      - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest
+      - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine:latest
       - .
 
-  # Push the image to Artifact Registry
+  # Push image
   - name: gcr.io/cloud-builders/docker
     args:
       - push
-      - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest
+      - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine:latest
 
   # Deploy to Cloud Run
   - name: gcr.io/cloud-builders/gcloud
     args:
       [
-        run, deploy, markdown-editor,
-        --image, us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest,
+        run, deploy, nginx-site,
+        --image, us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine:latest,
         --platform, managed,
         --region, us-central1,
         --allow-unauthenticated,
-        --port, "8080"
+        --port, "80"
       ]
-
-images:
-  - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest
