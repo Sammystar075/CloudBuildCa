@@ -1,12 +1,12 @@
 FROM nginx:alpine
 
-# Remove default config
+# Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
-# Add our config
+# Add our nginx config
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Copy website files
-COPY . /usr/share/nginx/html
+# Copy website files FROM the cloned repo
+COPY site/ /usr/share/nginx/html/
 
 EXPOSE 8080
