@@ -1,13 +1,12 @@
-# Tell Cloud Build where to send logs
-# CLOUD_LOGGING_ONLY avoids storage bucket permission issues
+#Shows logs on cloud interface
 options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # STEP 1: Build the Docker image
-  # --------------------------------
-  # This uses the Dockerfile in THIS repo
-  # "." means: use the current repo as the build context
+
+
+##builds the image with docker, and tags image
+
   - name: gcr.io/cloud-builders/docker
     args:
       [
@@ -16,19 +15,14 @@ steps:
         "."
       ]
 
-  # STEP 2: Push the image to Container Registry
-  # --------------------------------------------
-  # This uploads the image so Cloud Run can use it
+ #Pushes image to container rej
   - name: gcr.io/cloud-builders/docker
     args:
       [
         "push",
         "gcr.io/$PROJECT_ID/markdown-editor:latest"
       ]
-
-  # STEP 3: Deploy to Cloud Run
-  # ---------------------------
-  # This replaces the running service with the new image
+# pulls image and deploys
   - name: gcr.io/cloud-builders/gcloud
     args:
       [
@@ -40,7 +34,3 @@ steps:
         "--port", "8080"
       ]
 
-# This is optional but nice:
-# it lets Cloud Build know which image was produced
-images:
-  - "gcr.io/$PROJECT_ID/markdown-editor:latest"
