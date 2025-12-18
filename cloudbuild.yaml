@@ -1,38 +1,48 @@
+# Send logs only to Cloud Logging (avoids bucket permission pain)
 options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # 1️⃣ Clone website repo
+  # ============================================================
+  # STEP 1: Clone your WEBSITE repo (kindle-suite)
+  # ============================================================
   - name: gcr.io/cloud-builders/git
     args:
       - clone
       - https://github.com/Sammystar075/kindle-suite.git
-      - website
+      - site
 
-  # 2️⃣ Build nginx image using cloned files
+  # ============================================================
+  # STEP 2: Build Docker image
+  # ============================================================
+  # Uses the Dockerfile in THIS repo
+  # But the website files are copied from ./site
   - name: gcr.io/cloud-builders/docker
     args:
       [
         "build",
-        "-t",
-        "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest",
+        "-t", "gcr.io/$PROJECT_ID/nginx-site:latest",
         "."
       ]
 
-  # 3️⃣ Push image
+  # ============================================================
+  # STEP 3: Push image to Container Registry
+  # ============================================================
   - name: gcr.io/cloud-builders/docker
     args:
       [
         "push",
-        "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest"
+        "gcr.io/$PROJECT_ID/nginx-site:latest"
       ]
 
-  # 4️⃣ Deploy to Cloud Run
+  # ============================================================
+  # STEP 4: Deploy to Cloud Run
+  # ============================================================
   - name: gcr.io/cloud-builders/gcloud
     args:
       [
         "run", "deploy", "nginx-site",
-        "--image", "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest",
+        "--image", "gcr.io/$PROJECT_ID/nginx-site:latest",
         "--platform", "managed",
         "--region", "us-central1",
         "--allow-unauthenticated",
@@ -40,4 +50,4 @@ steps:
       ]
 
 images:
-  - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest
+  - "gcr.io/$PROJECT_ID/nginx-site:latest"
