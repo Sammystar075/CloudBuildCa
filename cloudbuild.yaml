@@ -1,45 +1,46 @@
-# Send logs only to Cloud Logging (avoids GCS logs bucket permission issues)
+# Tell Cloud Build where to send logs
+# CLOUD_LOGGING_ONLY avoids storage bucket permission issues
 options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-
-  # ============================================================
-  # STEP 3: Build image using THIS repo's Dockerfile + default.conf
-  # Build context is ".", which includes the cloned "site/" folder now.
-  # ============================================================
+  # STEP 1: Build the Docker image
+  # --------------------------------
+  # This uses the Dockerfile in THIS repo
+  # "." means: use the current repo as the build context
   - name: gcr.io/cloud-builders/docker
     args:
-      - build
-      - -t
-      - gcr.io/$PROJECT_ID/markdown-editor:latest
-      - .
+      [
+        "build",
+        "-t", "gcr.io/$PROJECT_ID/nginx-site:latest",
+        "."
+      ]
 
-  # ============================================================
-  # STEP 4: Push image
-  # ============================================================
+  # STEP 2: Push the image to Container Registry
+  # --------------------------------------------
+  # This uploads the image so Cloud Run can use it
   - name: gcr.io/cloud-builders/docker
     args:
-      - push
-      - gcr.io/$PROJECT_ID/markdown-editor:latest
+      [
+        "push",
+        "gcr.io/$PROJECT_ID/nginx-site:latest"
+      ]
 
-  # ============================================================
-  # STEP 5: Deploy to Cloud Run
-  # ============================================================
+  # STEP 3: Deploy to Cloud Run
+  # ---------------------------
+  # This replaces the running service with the new image
   - name: gcr.io/cloud-builders/gcloud
     args:
-      - run
-      - deploy
-      - nginx-site
-      - --image
-      - gcr.io/$PROJECT_ID/markdown-editor:latest
-      - --platform
-      - managed
-      - --region
-      - us-central1
-      - --allow-unauthenticated
-      - --port
-      - "8080"
+      [
+        "run", "deploy", "nginx-site",
+        "--image", "gcr.io/$PROJECT_ID/nginx-site:latest",
+        "--platform", "managed",
+        "--region", "us-central1",
+        "--allow-unauthenticated",
+        "--port", "8080"
+      ]
 
+# This is optional but nice:
+# it lets Cloud Build know which image was produced
 images:
-  - gcr.io/$PROJECT_ID/markdown-editor:latest
+  - "gcr.io/$PROJECT_ID/nginx-site:latest"
