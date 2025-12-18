@@ -2,7 +2,14 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  # Build Docker image
+  # 1️⃣ Clone website repo
+  - name: gcr.io/cloud-builders/git
+    args:
+      - clone
+      - https://github.com/Sammystar075/kindle-suite.git
+      - website
+
+  # 2️⃣ Build nginx image using cloned files
   - name: gcr.io/cloud-builders/docker
     args:
       [
@@ -12,7 +19,7 @@ steps:
         "."
       ]
 
-  # Push image
+  # 3️⃣ Push image
   - name: gcr.io/cloud-builders/docker
     args:
       [
@@ -20,22 +27,16 @@ steps:
         "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest"
       ]
 
-  # Deploy to Cloud Run
+  # 4️⃣ Deploy to Cloud Run
   - name: gcr.io/cloud-builders/gcloud
     args:
       [
-        "run",
-        "deploy",
-        "nginx-site",
-        "--image",
-        "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest",
-        "--platform",
-        "managed",
-        "--region",
-        "us-central1",
+        "run", "deploy", "nginx-site",
+        "--image", "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest",
+        "--platform", "managed",
+        "--region", "us-central1",
         "--allow-unauthenticated",
-        "--port",
-        "8080"
+        "--port", "8080"
       ]
 
 images:
