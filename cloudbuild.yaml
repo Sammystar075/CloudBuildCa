@@ -23,8 +23,8 @@ steps:
       - push
       - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine:latest
 
-- name: 'gcr.io/cloud-builders/gcloud'
-  args:
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
     [
       'run', 'deploy', 'markdown-editor',
       '--image', 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest',
