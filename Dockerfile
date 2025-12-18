@@ -1,12 +1,18 @@
+# Use Nginx Alpine
 FROM nginx:alpine
 
-# Remove default nginx config
-RUN rm /etc/nginx/conf.d/default.conf
+# Remove default Nginx config
+RUN rm -f /etc/nginx/conf.d/default.conf
 
-# Add our nginx config
+# Add your Nginx config (listens on 8080)
 COPY default.conf /etc/nginx/conf.d/default.conf
 
-# Copy website files FROM the cloned repo
+# IMPORTANT:
+# Delete the default Nginx welcome content so it can't "win"
+RUN rm -rf /usr/share/nginx/html/*
+
+# IMPORTANT:
+# Copy the CLONED website repo contents (the 'site' folder) into the web root
 COPY site/ /usr/share/nginx/html/
 
 EXPOSE 8080
