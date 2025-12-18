@@ -2,30 +2,37 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
+  # Clone the website repo
   - name: gcr.io/cloud-builders/git
     args:
       - clone
       - https://github.com/Sammystar075/kindle-suite.git
 
   # Build the Docker image
-  - name: 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest'
-    args: ['build', '-t', 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest, '.']
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - build
+      - -t
+      - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest
+      - .
 
-  # Push the image to Container Registry
-  - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest']
+  # Push the image to Artifact Registry
+  - name: gcr.io/cloud-builders/docker
+    args:
+      - push
+      - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest
 
   # Deploy to Cloud Run
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: gcr.io/cloud-builders/gcloud
     args:
       [
-        'run', 'deploy', 'markdown-editor',
-        '--image', 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest',
-        '--platform', 'managed',
-        '--region', 'us-central1',
-        '--allow-unauthenticated',
-        '--port', '8080'
+        run, deploy, markdown-editor,
+        --image, us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest,
+        --platform, managed,
+        --region, us-central1,
+        --allow-unauthenticated,
+        --port, "8080"
       ]
 
 images:
-  - 'gcr.io/$PROJECT_ID/nginx-alpine-simple:latest'
+  - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest
