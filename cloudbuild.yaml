@@ -2,39 +2,41 @@ options:
   logging: CLOUD_LOGGING_ONLY
 
 steps:
-  - name: 'gcr.io/cloud-builders/git'
-    args:
-      - clone
-      - https://github.com/Sammystar075/kindle-suite.git
-      - /workspace/kindle-suite
-
-  - name: 'gcr.io/cloud-builders/docker'
+  # Build Docker image
+  - name: gcr.io/cloud-builders/docker
     args:
       [
-        'build',
-        '-t', 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest',
-        '.'
-      ]
-    dir: /workspace/kindle-suite
-
-  - name: 'gcr.io/cloud-builders/docker'
-    args:
-      [
-        'push',
-        'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest'
+        "build",
+        "-t",
+        "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest",
+        "."
       ]
 
-  - name: 'gcr.io/cloud-builders/gcloud'
+  # Push image
+  - name: gcr.io/cloud-builders/docker
     args:
       [
-        'run', 'deploy', 'markdown-editor',
-        '--image', 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest',
-        '--platform', 'managed',
-        '--region', 'us-central1',
-        '--allow-unauthenticated',
-        '--port', '8080',
-        '--service-account', 'bob-le-builder@ca-1-10589529-2.iam.gserviceaccount.com'
+        "push",
+        "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest"
+      ]
+
+  # Deploy to Cloud Run
+  - name: gcr.io/cloud-builders/gcloud
+    args:
+      [
+        "run",
+        "deploy",
+        "nginx-site",
+        "--image",
+        "us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest",
+        "--platform",
+        "managed",
+        "--region",
+        "us-central1",
+        "--allow-unauthenticated",
+        "--port",
+        "8080"
       ]
 
 images:
-  - 'us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-alpine-simple:latest'
+  - us-central1-docker.pkg.dev/ca-1-10589529-2/docker-repo/nginx-site:latest
