@@ -11,7 +11,7 @@ liveness_check:
   check_interval_sec: 120
   failure_threshold: 3
 
-
+#Waits for app to be ready before deployment
 readiness_check:
   path: "/"
   app_start_timeout_sec: 30
