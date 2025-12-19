@@ -2,4 +2,4 @@
 
 # This script lets me quickly deploy my
 
-gcloud builds submit .
+gcloud builds submit . && gcloud run services list
